@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.project.exceptions.AccountAlreadyExistsException;
 import com.project.exceptions.InvalidPasswordException;
@@ -28,8 +29,13 @@ public class DoctorController {
 	
 	
 	@PostMapping("/register")
-	public ResponseEntity<String> register(@RequestBody Doctor doctor) throws AccountAlreadyExistsException{
-		doctorService.register(doctor);
+	public ResponseEntity<String> register(@RequestParam("name") String name,
+            @RequestParam("email") String email,
+            @RequestParam("phoneNumber") String phoneNumber,
+            @RequestParam("password") String password,
+            @RequestParam("medLic") String medLic,
+            @RequestParam("file") MultipartFile file) throws AccountAlreadyExistsException{
+		doctorService.register(name,email,phoneNumber,password,medLic,file);
 		return new ResponseEntity<String>("Registered Successfully",HttpStatus.CREATED);
 	}
 	@GetMapping("/login")

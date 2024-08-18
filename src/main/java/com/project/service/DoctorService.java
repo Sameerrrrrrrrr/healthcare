@@ -1,8 +1,11 @@
 package com.project.service;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.project.exceptions.AccountAlreadyExistsException;
 import com.project.exceptions.InvalidPasswordException;
@@ -22,14 +25,26 @@ public class DoctorService {
 		this.passwordEncoder = passwordEncoder;
 	}
 
-	public Doctor register(Doctor doctor) throws AccountAlreadyExistsException {
-		Doctor doc=doctorRepo.findByEmail(doctor.getEmail());
+	public Doctor register(String name, String email, String phoneNumber, String password,String medLic, MultipartFile file) throws AccountAlreadyExistsException {
+		Doctor doc=doctorRepo.findByEmail(email);
 		if(doc!=null) {
 			throw new AccountAlreadyExistsException("Account already exists with this email");
 		}
 		else {
-			String encodedPassword=passwordEncoder.encode(doctor.getPassword());
+			Doctor doctor=new Doctor();
+			doctor.setName(name);
+			doctor.setEmail(email);
+			doctor.setNumber(phoneNumber);
+			doctor.setMedLic(medLic);
+			String encodedPassword=passwordEncoder.encode(password);
 			doctor.setPassword(encodedPassword);
+			if (file != null && !file.isEmpty()) {
+	            try {
+	                doctor.setImage(file.getBytes());
+	            } catch (IOException e) {
+	                throw new RuntimeException("Failed to store image data", e);
+	            }
+	        }
 			return doctorRepo.save(doctor);
 		}
 	}
